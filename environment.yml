@@ -1,0 +1,27 @@
+name: benin-insights
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - jupyter
+  - notebook
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - plotly
+  - pip
+  - pip:
+    - polars
+    - streamlit
+    - google-cloud-bigquery
+    - google-auth
+    - db-dtypes
+    - transformers
+    - torch
+    - joblib
+    - python-dotenv
+    - fastapi
+    - uvicorn
