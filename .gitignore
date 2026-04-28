@@ -1,0 +1,18 @@
+# Données (Très important)
+data/raw/*
+data/processed/*
+*.csv
+*.parquet
+
+# Environnement et Secrets
+.env
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+credentials/
+*.json
+
+# Modèles et divers
+models/*.pkl
+models/*.joblib
+.DS_Store
