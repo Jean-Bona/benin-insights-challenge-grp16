@@ -1,0 +1,22 @@
+# Data Manipulation & Analysis
+pandas
+numpy
+polars
+db-dtypes
+
+# Google Cloud & GDELT Extraction
+google-cloud-bigquery
+google-auth
+
+# Visualization & Dashboard
+plotly
+streamlit
+seaborn
+matplotlib
+
+# Machine Learning
+scikit-learn
+joblib
+
+# Utilities
+python-dotenv
