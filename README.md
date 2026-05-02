@@ -59,3 +59,11 @@ L'intégralité des analyses, des interprétations et de la narration du projet 
 📄 Licence
 
 Ce projet est réalisé dans un cadre éducatif et compétitif pour le Hackathon 2026.
+## Données
+
+Les fichiers CSV ne sont pas versionnés (trop lourds).
+
+### Pour reproduire le dataset :
+1. Lancer la requête BigQuery dans `notebooks/01_pipeline_gdelt.ipynb`
+2. Exporter le résultat dans `data/raw/gdelt_benin_2025_raw.csv`
+3. Exécuter le notebook complet pour générer `data/processed/`
