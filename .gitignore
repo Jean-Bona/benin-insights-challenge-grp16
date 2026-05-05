@@ -1,6 +1,5 @@
 # Données (Très important)
-#data/raw/*
-#data/processed/*
+
 *.csv
 *.parquet
 
