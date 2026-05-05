@@ -22,19 +22,32 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────
-# STYLES
+# STYLES (Version corrigée sans bandeau blanc)
 # ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+/* 1. Rendre le header Streamlit transparent */
+header[data-testid="stHeader"] {
+    background: rgba(0,0,0,0) !important;
+}
+
+/* 2. Supprimer la bordure/ombre sous le header */
+[data-testid="stHeader"]::after {
+    display: none;
+}
+
 .stApp {
     background: linear-gradient(135deg, #06131f 0%, #0b1220 45%, #111827 100%);
     color: #e5eef9;
 }
+
 .block-container {
-    padding-top: 1.5rem;
+    /* On remet un padding pour descendre les onglets sous le header invisible */
+    padding-top: 4rem; 
     padding-bottom: 2rem;
     max-width: 1500px;
 }
+
 .glass-card {
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
@@ -44,6 +57,7 @@ st.markdown("""
     box-shadow: 0 8px 32px rgba(0,0,0,0.22);
     margin-bottom: 1rem;
 }
+
 .metric-title {
     font-size: 0.82rem;
     color: rgba(229,238,249,0.65);
@@ -51,17 +65,20 @@ st.markdown("""
     letter-spacing: 0.07em;
     margin-bottom: 0.3rem;
 }
+
 .metric-value {
     font-size: 1.9rem;
     font-weight: 700;
     color: #ffffff;
     line-height: 1.1;
 }
+
 .metric-sub {
     font-size: 0.78rem;
     color: rgba(229,238,249,0.50);
     margin-top: 0.25rem;
 }
+
 .hero-title {
     font-size: 2.2rem;
     font-weight: 800;
@@ -69,11 +86,13 @@ st.markdown("""
     letter-spacing: -0.02em;
     margin-bottom: 0.1rem;
 }
+
 .hero-subtitle {
     font-size: 0.95rem;
     color: rgba(229,238,249,0.65);
     margin-bottom: 1.2rem;
 }
+
 .insight-box {
     background: linear-gradient(135deg,
         rgba(0,97,74,0.18), rgba(252,199,0,0.06));
@@ -82,6 +101,7 @@ st.markdown("""
     padding: 1.1rem 1.3rem;
     margin-bottom: 0.9rem;
 }
+
 .insight-label {
     font-size: 0.75rem;
     text-transform: uppercase;
@@ -89,21 +109,23 @@ st.markdown("""
     color: rgba(229,238,249,0.55);
     margin-bottom: 0.3rem;
 }
+
 .insight-text {
     font-size: 0.95rem;
     line-height: 1.65;
     color: #f0f6ff;
 }
+
 .alerte  { color: #F44336; font-weight: 700; }
 .vigilance { color: #FFC107; font-weight: 700; }
 .normal  { color: #4CAF50; font-weight: 700; }
+
 section[data-testid="stSidebar"] {
     background: rgba(8,15,26,0.90);
     border-right: 1px solid rgba(255,255,255,0.08);
 }
 </style>
 """, unsafe_allow_html=True)
-
 # ─────────────────────────────────────────────────────────────
 # HELPERS
 # ─────────────────────────────────────────────────────────────
@@ -131,6 +153,13 @@ def dark_layout(height=400, margin=None):
         margin=m,
         height=height
     )
+def graph_info(text):
+    with st.expander("Comprendre ce graphique"):
+        st.markdown(
+            f'<div style="color:rgba(229,238,249,0.80);'
+            f'font-size:0.88rem;line-height:1.7;'
+            f'padding:0.3rem 0;">{text}</div>',
+            unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────
 # CHARGEMENT DES DONNEES
@@ -311,6 +340,17 @@ with tab1:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Indice de Risque Pays")
         st.caption("IRP mensuel — combinaison RF + Isolation Forest")
+        graph_info(
+    "Ce graphique montre <b>l'activité médiatique mensuelle</b> "
+    "autour du Bénin en 2025 selon trois angles :<br><br>"
+    "<b>Volume</b> : combien d'événements ont été couverts ce mois-ci "
+    "dans les médias du monde entier.<br>"
+    "<b>Score Goldstein</b> : un score de -10 à +10 qui mesure "
+    "si les événements sont plutôt coopératifs (+) ou conflictuels (-). "
+    "Au-dessus de 0 = le pays est perçu comme stable.<br>"
+    "<b>% violent</b> : la proportion d'événements classés comme "
+    "violents ce mois-là. Plus c'est rouge, plus la situation est tendue."
+)
 
         irp_df = pd.DataFrame([
             {'mois': k,
@@ -534,6 +574,22 @@ with tab2:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Carte des zones à risque")
         st.caption("Taille = volume · Couleur = niveau de risque")
+        graph_info(
+    "Chaque point sur la carte représente un <b>lieu précis</b> "
+    "mentionné dans les articles de presse couvrant le Bénin. "
+    "Important : seulement 9% des événements ont une localisation "
+    "précise — les 91% restants sont placés au centre du pays "
+    "par défaut et ne sont pas montrés ici.<br><br>"
+    "<b>Taille du point</b> : plus le point est grand, "
+    "plus cet endroit a été mentionné souvent dans les médias.<br>"
+    "<b style='color:#F44336'>Rouge = ALERTE</b> : zone très "
+    "conflictuelle (beaucoup de violence, score de stabilité négatif).<br>"
+    "<b style='color:#FFC107'>Orange = VIGILANCE</b> : zone à surveiller.<br>"
+    "<b style='color:#4CAF50'>Vert = NORMAL</b> : zone stable.<br><br>"
+    "Les zones rouges sont toutes situées dans le <b>nord du Bénin</b> "
+    "(Atakora, Alibori) — régions frontalières avec le Burkina Faso "
+    "et le Niger, sous pression des groupes armés depuis 2022."
+)
 
         geo_df = filt[
             filt['ActionGeo_Lat'].notna() &
@@ -629,6 +685,18 @@ with tab2:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Fracture Nord / Sud")
         st.caption("Comparaison des indicateurs clés par zone")
+        graph_info(
+    "Le Bénin est divisé en deux réalités très différentes :<br><br>"
+    "<b>Nord (Atakora / Alibori)</b> : zone frontalière avec le "
+    "Burkina Faso et le Niger. Depuis 2022, des groupes armés "
+    "jihadistes y mènent des attaques régulières. "
+    "Notre analyse montre que 40% des événements y sont violents.<br><br>"
+    "<b>Sud</b> : zone économique et diplomatique stable, "
+    "où se trouvent Cotonou, Porto-Novo et Abomey. "
+    "Seulement 12% d'événements violents.<br><br>"
+    "<b>Non localisé</b> : 91% des événements GDELT n'ont pas "
+    "de localisation précise — ils reflètent la tendance nationale globale."
+)
 
         zone_stats = filt.groupby('zone_geo').agg(
             nb=('SQLDATE', 'count'),
@@ -697,6 +765,18 @@ with tab2:
     # ── Evolution mensuelle nord vs sud ───────────────────────
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Evolution mensuelle — Nord vs Sud")
+    graph_info(
+    "Ce graphique montre mois par mois comment évolue "
+    "le <b>pourcentage d'événements violents</b> dans le nord "
+    "et le sud du Bénin.<br><br>"
+    "La courbe <b style='color:#F44336'>rouge (nord)</b> est "
+    "systématiquement au-dessus de la moyenne nationale — "
+    "le nord est en état de tension permanente tout au long de l'année.<br>"
+    "La courbe <b style='color:#4CAF50'>verte (sud)</b> reste "
+    "en dessous de la moyenne — le sud est stable.<br><br>"
+    "Le pic d'avril 2025 dans le nord (>60%) correspond à une "
+    "série d'attaques terroristes concentrées sur ce mois."
+)
 
     nord_m = filt[filt['zone_geo'] == 'Nord (Atakora / Alibori)']\
         .groupby('mois')['is_violent'].mean().reset_index()
@@ -789,6 +869,19 @@ with tab3:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Distribution des types d'evenements")
         st.caption("Codes CAMEO — bleu=cooperatif, rouge=conflictuel")
+        graph_info(
+    "GDELT classe chaque événement selon un système international "
+    "appelé <b>CAMEO</b> qui répertorie 20 types d'actions possibles. "
+    "Ce graphique montre combien d'événements de chaque type "
+    "ont été recensés au Bénin en 2025.<br><br>"
+    "<b style='color:#60a5fa'>Bleu</b> = événements de coopération "
+    "et de diplomatie (accords, consultations, aide, médiation).<br>"
+    "<b style='color:#F44336'>Rouge</b> = événements conflictuels "
+    "(menaces, protestations, violence, usage d'armes).<br><br>"
+    "Le fait que la coopération domine (>80%) montre que le Bénin "
+    "est perçu avant tout comme un pays diplomatiquement actif — "
+    "même si 17% des événements sont violents."
+)
 
         event_counts = filt.groupby(
             ['EventRootCode', 'is_violent']
@@ -837,6 +930,20 @@ with tab3:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Types d'acteurs et violence")
         st.caption("% violence par Actor1Type1Code (n >= 30)")
+        graph_info(
+    "Pour chaque <b>type d'acteur</b> impliqué dans les événements, "
+    "ce graphique montre quel pourcentage de leurs actions "
+    "sont violentes.<br><br>"
+    "<b>UAF</b> (forces armées non identifiées) : 70% de violence — "
+    "ce sont principalement les groupes jihadistes du nord.<br>"
+    "<b>REB</b> (rebelles) : 48% — groupes armés organisés.<br>"
+    "<b>COP</b> (forces de l'ordre) : 40% — interventions "
+    "sécuritaires de riposte aux attaques.<br>"
+    "<b>GOV</b> (gouvernement) : 11% — l'État agit surtout "
+    "par la diplomatie et la coopération.<br><br>"
+    "La ligne pointillée représente la moyenne nationale (17%). "
+    "Tout ce qui est au-dessus est plus violent que la normale."
+)
 
         actor_stats = filt[
             filt['Actor1Type1Code'] != 'Non identifié'
@@ -885,6 +992,18 @@ with tab3:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Heatmap — Patterns saisonniers")
     st.caption("% mensuel par type d'evenement")
+    graph_info(
+    "Cette carte de chaleur montre <b>comment se répartit "
+    "chaque type d'événement mois par mois</b>. "
+    "Chaque case indique le pourcentage du mois occupé "
+    "par ce type d'événement.<br><br>"
+    "<b>Plus la case est foncée (rouge/orange)</b>, "
+    "plus ce type d'événement est dominant ce mois-là.<br><br>"
+    "Par exemple : si 'Usage d'armes' est très foncé en avril, "
+    "cela signifie qu'avril a eu une proportion inhabituellement "
+    "élevée d'événements liés aux armes — "
+    "ce qui correspond aux attaques terroristes du nord ce mois-là."
+)
 
     pivot_heat = filt.groupby(
         ['mois', 'EventRootCode']
@@ -927,6 +1046,17 @@ with tab3:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Top 20 evenements les plus impactants")
     st.caption("Classés par impact pondéré (Goldstein × log(NumArticles))")
+    graph_info(
+    "Cette liste présente les <b>20 événements les plus importants</b> "
+    "de l'année, classés par leur impact pondéré — "
+    "un score qui combine la gravité de l'événement "
+    "(score Goldstein) et sa couverture médiatique "
+    "(nombre d'articles).<br><br>"
+    "Un événement très grave mais peu couvert pèse moins "
+    "qu'un événement grave ET très médiatisé. "
+    "C'est une mesure de l'<b>impact réel perçu</b> "
+    "par la communauté internationale."
+)
 
     cols_show = ['SQLDATE', 'type_quadclass', 'zone_geo',
                  'Actor1Name', 'Actor2Name', 'NumArticles',
@@ -993,6 +1123,21 @@ with tab4:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Couverture par communauté linguistique")
         st.caption("Répartition des articles par communauté")
+        graph_info(
+    "Ce graphique montre <b>quelles communautés linguistiques "
+    "couvrent le plus le Bénin</b> dans les médias mondiaux.<br><br>"
+    "<b>Anglophone / Commonwealth (49%)</b> : principalement "
+    "la presse nigériane — le Nigeria, pays voisin, suit "
+    "de près l'actualité béninoise.<br>"
+    "<b>Francophonie (5%)</b> : étonnamment faible pour un "
+    "pays francophone — la presse béninoise elle-même "
+    "est peu indexée par GDELT.<br>"
+    "<b>Chine (1%)</b> : couverture positive via Xinhua/CGTN, "
+    "axée sur la coopération sino-africaine.<br><br>"
+    "Le tableau en dessous montre le <b>ton moyen</b> de chaque "
+    "communauté : un nombre négatif signifie une couverture "
+    "pessimiste, positif signifie optimiste."
+)
 
         comm = filt['communaute_linguistique'].value_counts(
         ).reset_index()
@@ -1065,6 +1210,18 @@ with tab4:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Top 20 médias")
         st.caption("Volume · Ton médiatique · % violent")
+        graph_info(
+    "Les 20 médias qui couvrent le plus le Bénin, "
+    "avec pour chacun trois informations :<br><br>"
+    "<b>n=</b> : nombre d'articles publiés sur le Bénin.<br>"
+    "<b>ton=</b> : le ton éditorial moyen. "
+    "Négatif = couverture pessimiste, positif = optimiste.<br>"
+    "<b>% viol.</b> : la proportion de leurs articles "
+    "qui concernent des événements violents.<br><br>"
+    "<b style='color:#F44336'>Rouge</b> = média très négatif (ton < -2).<br>"
+    "<b style='color:#FFC107'>Orange</b> = média légèrement négatif.<br>"
+    "<b style='color:#4CAF50'>Vert</b> = média à couverture positive."
+)
 
         top_media = filt.groupby('source_domain').agg(
             nb=('SQLDATE', 'count'),
@@ -1108,6 +1265,19 @@ with tab4:
     st.subheader("Distribution du ton médiatique")
     st.caption("Cooperatif vs Conflictuel — "
                "même la cooperation est couverte négativement")
+    graph_info(
+    "Ce graphique montre <b>comment les médias parlent "
+    "du Bénin</b> selon le type d'événement.<br><br>"
+    "L'<b>AvgTone</b> mesure le sentiment général des articles : "
+    "0 = neutre, valeurs négatives = couverture pessimiste, "
+    "valeurs positives = couverture optimiste.<br><br>"
+    "Observation clé : même les événements de coopération "
+    "(en bleu) ont un ton légèrement négatif en moyenne. "
+    "Cela révèle un <b>biais structurel des médias internationaux</b> "
+    "qui tendent à couvrir l'Afrique subsaharienne "
+    "avec un prisme pessimiste, indépendamment "
+    "de ce qui se passe réellement."
+)
 
     col_dist1, col_dist2 = st.columns(2, gap="large")
 
@@ -1224,6 +1394,18 @@ with tab5:
                         unsafe_allow_html=True)
             st.subheader("Courbe ROC")
             st.caption("AUC = 0.780 — bien au-dessus du hasard (0.5)")
+            graph_info(
+    "La <b>courbe ROC</b> mesure la capacité du modèle "
+    "à distinguer les événements violents des non-violents.<br><br>"
+    "La courbe bleue représente notre modèle. "
+    "Plus elle est proche du coin supérieur gauche, "
+    "meilleur est le modèle.<br>"
+    "La ligne pointillée grise = un modèle qui choisit au hasard.<br><br>"
+    "<b>AUC = 0.780</b> signifie que si le modèle compare "
+    "un événement violent et un non-violent au hasard, "
+    "il identifie correctement lequel est violent "
+    "<b>78% du temps</b>."
+)
 
             # Courbe ROC approximée pour visualisation
             fpr_approx = np.linspace(0, 1, 100)
@@ -1260,6 +1442,21 @@ with tab5:
                         unsafe_allow_html=True)
             st.subheader("Feature Importance")
             st.caption("Quelles variables expliquent la violence ?")
+            graph_info(
+    "Ce graphique montre <b>quelles informations sont les plus "
+    "utiles au modèle</b> pour prédire si un événement sera violent.<br><br>"
+    "<b>AvgTone (0.328)</b> : le ton de l'article est le meilleur "
+    "signal — quand les médias couvrent un événement très négativement, "
+    "il est souvent violent.<br>"
+    "<b>AvgTone_sq (0.161)</b> : les extrêmes (très positif ou "
+    "très négatif) sont encore plus informatifs.<br>"
+    "<b>Communauté linguistique (0.121)</b> : la source de l'article "
+    "influence aussi la prédiction.<br><br>"
+    "Note : nous avons volontairement exclu les variables "
+    "directement liées à la classification des événements "
+    "pour éviter de 'tricher' — le modèle prédit vraiment, "
+    "il ne recopie pas la réponse."
+)
 
             features = ['AvgTone', 'AvgTone_sq',
                         'communaute_linguistique',
@@ -1377,6 +1574,20 @@ with tab5:
                     unsafe_allow_html=True)
         st.subheader("Scores d'anomalie — Isolation Forest")
         st.caption("Plus le score est bas, plus le mois est anormal")
+        graph_info(
+    "L'<b>Isolation Forest</b> est un algorithme qui détecte "
+    "automatiquement les périodes inhabituelles "
+    "sans qu'on lui dise ce qu'est une crise.<br><br>"
+    "Il attribue un <b>score d'anomalie</b> à chaque mois/zone. "
+    "Plus ce score est bas (négatif), plus la période est anormale.<br><br>"
+    "La ligne pointillée rouge = seuil d'anomalie. "
+    "Tout ce qui est en dessous est considéré comme anormal.<br><br>"
+    "En 2025, le modèle a automatiquement détecté :<br>"
+    "- Avril nord : pic d'attaques terroristes<br>"
+    "- Janvier nord : début de l'insécurité<br>"
+    "- Décembre non localisé : tentative de coup d'état<br>"
+    "- Novembre sud : période exceptionnellement stable (anomalie positive)"
+)
 
         mois_if = ['01/25', '02/25', '03/25', '04/25',
                    '05/25', '06/25', '07/25', '08/25',
@@ -1447,6 +1658,19 @@ with tab5:
         st.caption(
             "Modele entrainé sur jan-nov · Evalué sur décembre "
             "sans l'avoir vu")
+        graph_info(
+    "Le <b>backtesting</b> est un test de réalisme : "
+    "on cache les données de décembre au modèle, "
+    "on l'entraîne uniquement sur janvier-novembre, "
+    "puis on lui demande d'évaluer décembre.<br><br>"
+    "Si le modèle identifie décembre comme anormal "
+    "sans l'avoir jamais vu, c'est la preuve qu'il aurait pu "
+    "<b>alerter en temps réel</b> avant de connaître l'issue.<br><br>"
+    "Résultat : la zone 'Non localisé' de décembre est correctement "
+    "détectée comme anormale — notre système d'alerte aurait "
+    "fonctionné le 1er décembre, une semaine avant "
+    "la tentative de coup d'état du 7 décembre."
+)
 
         col_bt1, col_bt2 = st.columns(2, gap="large")
 
@@ -1518,6 +1742,19 @@ with tab5:
             "IRP = 0.4 × P(violent|RF) + "
             "0.4 × Anomalie_IF + 0.2 × % violent observé"
         )
+        graph_info(
+    "Ce graphique décompose l'IRP mensuel en ses trois composantes.<br><br>"
+    "<b style='color:#60a5fa'>Bleu (RF)</b> : contribution du "
+    "Random Forest — ce que le modèle IA prédit.<br>"
+    "<b style='color:#a78bfa'>Violet (IF)</b> : contribution de "
+    "l'Isolation Forest — ce que le détecteur d'anomalies signale.<br>"
+    "<b style='color:#fb923c'>Orange (Obs.)</b> : les données "
+    "réelles observées — ancrage factuel du score.<br><br>"
+    "La ligne blanche = IRP total. "
+    "Les marqueurs <b style='color:#F44336'>rouges</b> = ALERTE, "
+    "<b style='color:#FFC107'>orange</b> = VIGILANCE, "
+    "<b style='color:#4CAF50'>verts</b> = NORMAL."
+)
 
         irp_df2 = pd.DataFrame([
             {'mois': k,
