@@ -1,6 +1,6 @@
 # Données (Très important)
 
-*.csv
+
 *.parquet
 
 # Environnement et Secrets
