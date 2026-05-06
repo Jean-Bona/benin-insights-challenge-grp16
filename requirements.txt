@@ -1,17 +1,13 @@
-# Data Manipulation & Analysis
-pandas
+# Data & BigQuery
+pandas>=2.0.0
 numpy
 polars
 db-dtypes
 pyarrow
 
-# Google Cloud & GDELT Extraction
-google-cloud-bigquery
-google-auth
-
-# Visualization & Dashboard
-plotly
+# Dashboard & Viz
 streamlit
+plotly
 seaborn
 matplotlib
 
@@ -19,5 +15,7 @@ matplotlib
 scikit-learn
 joblib
 
-# Utilities
+# NLP & API (Si nécessaire)
+transformers
+torch
 python-dotenv
